@@ -104,3 +104,10 @@ InitTestScene*.unity*
 
 # AI simulation reports (Game/Simulation/Run)
 /SimulationReports/
+
+# Raw third-party assets
+/_SourceAssets/
+
+# Restricted CraftPix assets
+/Assets/ThirdParty/CraftPix/
+/Assets/ThirdParty/CraftPix.meta
