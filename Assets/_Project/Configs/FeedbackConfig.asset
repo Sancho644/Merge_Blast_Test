@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62064bb2e2ae08d44b36a3533cb049a9, type: 3}
+  m_Name: FeedbackConfig
+  m_EditorClassIdentifier: Assembly-CSharp::MergeBlast.FeedbackConfig
+  <OverloadTimeScale>k__BackingField: 0.35
+  <OverloadSlowdownDuration>k__BackingField: 0.3
+  <OverloadShakeDuration>k__BackingField: 0.2
+  <OverloadShakeAmplitude>k__BackingField: 0.12
+  <ShotPitchRange>k__BackingField: {x: 0.95, y: 1.05}
+  <MergePitches>k__BackingField: {x: 1, y: 1.12, z: 1.25, w: 1.4}
+  <ButtonAnimationDuration>k__BackingField: 0.15
+  <ScreenAnimationDuration>k__BackingField: 0.25
