@@ -28,44 +28,44 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.5
+      value: 0.3
       inSlope: 0
-      outSlope: 0.013333334
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 15
-      value: 0.7
-      inSlope: 0.013333334
-      outSlope: 0.013333334
+      value: 0.4
+      inSlope: 0.006666667
+      outSlope: 0.006666667
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 30
-      value: 0.9
-      inSlope: 0.013333334
-      outSlope: 0.013333334
+      value: 0.5
+      inSlope: 0.006666667
+      outSlope: 0.006666667
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 45
-      value: 1.1
-      inSlope: 0.013333334
-      outSlope: 0.020000001
+      value: 0.6
+      inSlope: 0.01
+      outSlope: 0.01
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 60
-      value: 1.4
-      inSlope: 0.020000001
+      value: 0.8
+      inSlope: 0.013333334
       outSlope: 0.013333334
       tangentMode: 0
       weightedMode: 0
@@ -73,8 +73,8 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 75
-      value: 1.6
-      inSlope: 0.013333334
+      value: 1
+      inSlope: 0
       outSlope: 0
       tangentMode: 0
       weightedMode: 0
@@ -83,6 +83,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  <MaxActive>k__BackingField: 16
+  <MaxActive>k__BackingField: 8
   <FirstPairNominal>k__BackingField: 16
   <FirstPairSpawnWindow>k__BackingField: {x: 12, y: 18}

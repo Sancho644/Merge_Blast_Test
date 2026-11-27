@@ -38,11 +38,12 @@ namespace MergeBlast
         };
 
         public IReadOnlyList<Tier> Tiers => _tiers;
-        [field: SerializeField] public float GravityScale { get; private set; } = 0.8f;
+        [field: SerializeField] public float GravityScale { get; private set; } = 0.5f;
         [field: SerializeField] public float Bounciness { get; private set; } = 1f;
         [field: SerializeField] public float Friction { get; private set; }
-        [field: SerializeField] public Vector2 SpawnHorizontalSpeed { get; private set; } = new(2f, 4f);
-        [field: SerializeField] public float MinFloorBounceSpeed { get; private set; } = 6f;
+        [field: SerializeField] public Vector2 SpawnHorizontalSpeed { get; private set; } = new(1.4f, 2.8f);
+        [field: SerializeField] public float MinFloorBounceSpeed { get; private set; } = 4.5f;
+        [field: SerializeField] public float ProjectileHitImpulse { get; private set; } = 0.25f;
         [field: SerializeField] public float MergeCooldown { get; private set; } = 0.25f;
         [field: SerializeField] public float MergeUpwardImpulse { get; private set; } = 1f;
         [field: SerializeField] public float OverloadRadius { get; private set; } = 3f;
