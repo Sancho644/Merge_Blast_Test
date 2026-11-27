@@ -105,9 +105,25 @@ InitTestScene*.unity*
 # AI simulation reports (Game/Simulation/Run)
 /SimulationReports/
 
-# Raw third-party assets
+# Local raw third-party assets and metadata
 /_SourceAssets/
+/_SourceAssets.meta
+# Also ignore the legacy location if a local copy is restored there.
+/Assets/_SourceAssets/
+/Assets/_SourceAssets.meta
 
 # Restricted CraftPix assets
 /Assets/ThirdParty/CraftPix/
 /Assets/ThirdParty/CraftPix.meta
+
+# Track with unresolved redistribution rights
+neon_sign_circuit_bpm145.ogg
+neon_sign_circuit_bpm145.ogg.meta
+
+# Android signing and local build settings
+*.keystore
+*.jks
+*.keystore.meta
+*.jks.meta
+/local.properties
+/Assets/Plugins/Android/local.properties

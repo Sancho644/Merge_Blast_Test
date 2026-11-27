@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14a65aade99690243abe08e446a82d9b, type: 3}
+  m_Name: ProgressionConfig
+  m_EditorClassIdentifier: Assembly-CSharp::MergeBlast.ProgressionConfig
+  _cannonLevels:
+  - Level: 1
+    UpgradeCost: 0
+    Damage: 1
+    FireRate: 4
+    MaxAvailableBounces: 0
+    Visual: {fileID: 0}
+  - Level: 2
+    UpgradeCost: 50
+    Damage: 2
+    FireRate: 4
+    MaxAvailableBounces: 0
+    Visual: {fileID: 0}
+  - Level: 3
+    UpgradeCost: 75
+    Damage: 2
+    FireRate: 4.5
+    MaxAvailableBounces: 1
+    Visual: {fileID: 0}
+  - Level: 4
+    UpgradeCost: 100
+    Damage: 3
+    FireRate: 4.5
+    MaxAvailableBounces: 1
+    Visual: {fileID: 0}
+  - Level: 5
+    UpgradeCost: 125
+    Damage: 3
+    FireRate: 5
+    MaxAvailableBounces: 1
+    Visual: {fileID: 0}
+  - Level: 6
+    UpgradeCost: 150
+    Damage: 4
+    FireRate: 5
+    MaxAvailableBounces: 2
+    Visual: {fileID: 0}
+  - Level: 7
+    UpgradeCost: 175
+    Damage: 4
+    FireRate: 5.5
+    MaxAvailableBounces: 2
+    Visual: {fileID: 0}
+  - Level: 8
+    UpgradeCost: 200
+    Damage: 5
+    FireRate: 5.5
+    MaxAvailableBounces: 2
+    Visual: {fileID: 0}
+  - Level: 9
+    UpgradeCost: 250
+    Damage: 5
+    FireRate: 6
+    MaxAvailableBounces: 3
+    Visual: {fileID: 0}
+  - Level: 10
+    UpgradeCost: 300
+    Damage: 6
+    FireRate: 6
+    MaxAvailableBounces: 3
+    Visual: {fileID: 0}
+  _ricochetLevels:
+  - Level: 1
+    RequiredCannonLevel: 3
+    Price: 50
+  - Level: 2
+    RequiredCannonLevel: 6
+    Price: 100
+  - Level: 3
+    RequiredCannonLevel: 9
+    Price: 150
