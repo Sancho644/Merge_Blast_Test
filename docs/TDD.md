@@ -67,7 +67,7 @@ Start → Battle → Results → Meta → Battle; Results → Battle для quic
 
 ## 5. Prefabs / Physics
 - Cannon: Kinematic RB2D, trigger collider, Visual/Animator, shoot point. CraftPix целые кадры: не требовать отдельных спрайтов ствола/корпуса. Автоанимация перезапускается/ускоряется под fire rate; выстрел не зависит от AnimationEvent.
-- Ball: Dynamic RB2D, CircleCollider2D, gravity 0.8, material restitution 1, friction 0; визуал отделён от коллайдера. Freeze rotation для текста (или отдельный неповорачивающийся visual). Min bounce от пола. Состояние запрещает попадания/merge после удаления. Эффекты scale не меняют физический радиус.
+- Для Ball используются Dynamic RB2D и CircleCollider2D. BallConfig задаёт gravity scale 0,5, начальную горизонтальную скорость 1,4–2,8 units/sec по модулю, минимальную вертикальную скорость отскока от пола 4,5 units/sec, bounciness 1 и friction 0. Визуал отделён от коллайдера. Freeze rotation для текста (или отдельный неповорачивающийся visual). Состояние запрещает попадания/merge после удаления. Эффекты scale не меняют физический радиус.
 - BombBall: отдельный Dynamic prefab, world-space radial Filled Image и NumberText, 6 кадров Red Orb.
 - Projectile: SpriteRenderer, TrailRenderer; логика CircleCast, без физического RB/collider. Слой Projectile для организации.
 - Границы: статические Collider2D, слой Boundary.
@@ -94,6 +94,8 @@ BombBall.Update уменьшает scaled timer только в Battle. TimerIma
 ScriptableObject: BattleConfig (duration, hearts, victoryBonus, invuln); BallConfig (tiers, HP, radius, sprite, color, reward, physics, mergeCooldown, Overload); CannonConfig (moveSpeed, bulletSpeed, bulletRadius, lifetime); ProgressionConfig (10 CannonLevelData, 3 RicochetData); WaveConfig (phases, spawn curve, first pair 16, maxActive); BombConfig (spawn chance, cooldown, duration, tiers); FeedbackConfig (shake, slowdown, pitches, timing). Не мутировать SO при игре.
 
 CannonLevelData: Level, UpgradeCost (цена достижения), Damage, FireRate, MaxAvailableBounces, Visual. PlayerProgress: Coins=0, CannonLevel=1, RicochetLevel=0. RicochetData: Level, RequiredCannonLevel, Price. При покупке проверять next level, max, деньги и prerequisite до изменения состояния. Характеристики и визуал из конфигов; только GDD определяет стартовые значения.
+
+WaveConfig задаёт лимит 8 и частоты 0,3 / 0,4 / 0,5 / 0,6 / 0,8 / 1,0 шара/сек на отметках 0 / 15 / 30 / 45 / 60 / 75 сек. Совпадающие касательные в узлах дают плавный монотонный переход, а нулевая касательная на 75 сек согласует кривую с постоянной частотой после этой отметки. При заполнении арены BallSpawner сбрасывает прогресс интервала. После освобождения места он отсчитывает новый интервал и выпускает максимум один шар за обновление. Restart очищает активные объекты и прогресс спавна. В P1 спавнер работает, пока BattleSession активна. Завершение по таймеру добавляется в P4.
 
 ## 9. События / аудио
 BattleStarted, BattleEnded, HealthChanged, TimerChanged, BattleCoinsChanged, BallHit, BallDestroyed, BallsMerged, OverloadTriggered, BombSpawned, BombDetonated, ProjectileRicocheted, UpgradePurchased, WalletChanged. Позиции/номинал передавать в payload для FX, не зависеть от уже удалённого Transform. Не начислять награду в двух подписчиках. FeedbackService управляет единственным slowdown: хранит исходный fixedDeltaTime, восстанавливает на новом бою/выходе/disable; эффект длится unscaled. UI animation unscaled; звук см. AUDIO_GUIDE. При сильных эффектах не мешать тач-контролю.

@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace MergeBlast
 {
+    [DefaultExecutionOrder(-100)]
     public sealed class PortraitLayout : MonoBehaviour
     {
         [SerializeField] private Camera _camera;
@@ -12,14 +13,15 @@ namespace MergeBlast
         [SerializeField] private Transform _topWall;
         [SerializeField] private Transform _floor;
         [SerializeField] private Transform _spawnArea;
-        [SerializeField] private Transform _cannon;
         [SerializeField, Min(2f)] private float _arenaWidth = 7.2f;
+        [SerializeField, Min(0f)] private float _cannonHeightAboveFloor = 0.45f;
 
         private Vector2Int _screenSize;
         private Rect _safeAreaPixels;
 
         public Rect ArenaBounds { get; private set; }
         public Rect SpawnBounds { get; private set; }
+        public float CannonY => ArenaBounds.yMin + _cannonHeightAboveFloor;
 
         private void OnEnable()
         {
@@ -78,10 +80,6 @@ namespace MergeBlast
             SpawnBounds = Rect.MinMaxRect(ArenaBounds.xMin + spawnInset, top - 1.75f,
                 ArenaBounds.xMax - spawnInset, top - spawnInset);
             Place(_spawnArea, SpawnBounds.center.x, SpawnBounds.center.y, SpawnBounds.width, SpawnBounds.height);
-
-            _cannon.position = new Vector3(
-                Mathf.Clamp(_cannon.position.x, ArenaBounds.xMin + 0.45f, ArenaBounds.xMax - 0.45f),
-                bottom + 0.45f, _cannon.position.z);
         }
 
         private static void Place(Transform item, float x, float y, float width, float height)
