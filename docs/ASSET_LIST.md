@@ -63,3 +63,7 @@ CC0: https://creativecommons.org/publicdomain/zero/1.0/ . Сохранить п�
 
 - В `Assets/_Project/Art/ColoredSpheres/` импортированы четыре PNG из набора athile. В `BallConfig` номиналам 2, 4, 8 и 16 назначены `sphere-13.png`, `sphere-23.png`, `sphere-02.png` и `sphere-12.png` соответственно. Лицензия CC0 указана на странице автора и в уведомлениях проекта. [Colored Spheres](https://opengameart.org/content/colored-spheres) · [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md)
 - Для пушки, снарядов и HUD используются геометрия проекта и текущий TMP-шрифт. Источники остаются в корневом `_SourceAssets/`.
+
+## 6. Импорт P2.1
+
+- Для предварительного Ball Destroy импортирован один `PNG (Transparent)/spark_01.png` из локального `_SourceAssets/Graphics/` в `Assets/_Project/Art/Particles/`. SHA-256 файла совпал с исходником в официальном архиве. Настройки Unity — одиночный Sprite, прозрачность alpha, без mipmaps, максимальный размер 256 px. [Kenney Particle Pack](https://kenney.nl/assets/particle-pack) · [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md)

@@ -44,9 +44,25 @@ namespace MergeBlast
         [field: SerializeField] public Vector2 SpawnHorizontalSpeed { get; private set; } = new(1.4f, 2.8f);
         [field: SerializeField] public float MinFloorBounceSpeed { get; private set; } = 4.5f;
         [field: SerializeField] public float ProjectileHitImpulse { get; private set; } = 0.25f;
+        [field: SerializeField, Min(0f)] public float SpawnMergeCooldown { get; private set; } = 0.75f;
         [field: SerializeField] public float MergeCooldown { get; private set; } = 0.25f;
         [field: SerializeField] public float MergeUpwardImpulse { get; private set; } = 1f;
         [field: SerializeField] public float OverloadRadius { get; private set; } = 3f;
         [field: SerializeField] public int OverloadDamage { get; private set; } = 16;
+
+        internal bool TryGetTier(int nominal, out Tier tier)
+        {
+            foreach (var candidate in _tiers)
+            {
+                if (candidate.Nominal == nominal)
+                {
+                    tier = candidate;
+                    return true;
+                }
+            }
+
+            tier = default;
+            return false;
+        }
     }
 }

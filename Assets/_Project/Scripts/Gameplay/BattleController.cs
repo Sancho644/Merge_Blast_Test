@@ -11,8 +11,10 @@ namespace MergeBlast
         [SerializeField] private CannonController _cannon;
         [SerializeField] private CannonShooter _shooter;
         [SerializeField] private BallSpawner _spawner;
+        [SerializeField] private MergeSystem _merge;
+        [SerializeField] private MergeFeedback _mergeFeedback;
 
-        private float _startedAt;
+        private double _startedAt;
         private float _baseFixedDeltaTime;
 
         public BattleSession Session { get; private set; }
@@ -28,16 +30,22 @@ namespace MergeBlast
         private void Update()
         {
             if (Session?.IsActive != true)
+            {
+                if (_spawner.Session != null)
+                    StopRuntime();
                 return;
+            }
 
-            _spawner.Tick(Time.time - _startedAt, Time.deltaTime);
+            _merge.ResolvePending(Session);
+            _spawner.Tick(Time.timeAsDouble - _startedAt, Time.deltaTime);
         }
 
         public void StartBattle()
         {
             StopRuntime();
             Session = new BattleSession(_config);
-            _startedAt = Time.time;
+            _spawner.BeginBattle(Session);
+            _startedAt = Time.timeAsDouble;
             _cannon.BeginBattle();
             _input.SetAcceptInput(true);
             _shooter.BeginBattle(_progression.CannonLevels[0]);
@@ -51,15 +59,18 @@ namespace MergeBlast
 
             if (Session.IsActive)
                 ball.BounceFromCannon(cannonPosition);
-            else
-                StopRuntime();
 
             Changed?.Invoke();
         }
 
         private void OnBallDestroyed(int reward)
         {
-            if (Session?.AddReward(reward) == true)
+            AddReward(Session, reward);
+        }
+
+        internal void AddReward(BattleSession session, int reward)
+        {
+            if (session == Session && session?.AddReward(reward) == true)
                 Changed?.Invoke();
         }
 
@@ -73,6 +84,10 @@ namespace MergeBlast
         private void StopRuntime()
         {
             Session?.End();
+            if (_merge != null)
+                _merge.Clear();
+            if (_mergeFeedback != null)
+                _mergeFeedback.Clear();
             if (_input != null)
                 _input.SetAcceptInput(false);
             if (_cannon != null)

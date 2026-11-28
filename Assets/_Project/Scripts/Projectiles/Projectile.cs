@@ -40,7 +40,7 @@ namespace MergeBlast
                 RaycastHit2D hit = _hits[0];
                 transform.position = hit.centroid;
                 if (hit.collider.TryGetComponent<Ball>(out var ball))
-                    ball.TryDamage(_damage, Vector2.up);
+                    ball.TryDamage(_damage, Vector2.up, fromProjectile: true);
 
                 Despawn();
                 return;

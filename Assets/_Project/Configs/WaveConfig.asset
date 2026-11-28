@@ -84,5 +84,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   <MaxActive>k__BackingField: 8
+  <MinSpawnInterval>k__BackingField: 1
   <FirstPairNominal>k__BackingField: 16
   <FirstPairSpawnWindow>k__BackingField: {x: 12, y: 18}

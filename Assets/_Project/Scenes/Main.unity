@@ -1368,6 +1368,8 @@ MonoBehaviour:
   _occupiedMask:
     serializedVersion: 2
     m_Bits: 4608
+  _merge: {fileID: 2066649388}
+  _feedback: {fileID: 1644629510}
 --- !u!114 &805353860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2023,6 +2025,8 @@ MonoBehaviour:
   _cannon: {fileID: 1868706959}
   _shooter: {fileID: 1868706958}
   _spawner: {fileID: 714575256}
+  _merge: {fileID: 2066649388}
+  _mergeFeedback: {fileID: 1644629510}
 --- !u!1 &1135035426
 GameObject:
   m_ObjectHideFlags: 0
@@ -2864,6 +2868,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1644629509}
+  - component: {fileID: 1644629510}
   m_Layer: 0
   m_Name: FeedbackService
   m_TagString: Untagged
@@ -2886,6 +2891,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2062906274}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1644629510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1644629508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13a603fd5b3a9d1439bcc448423d9d10, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MergeBlast.MergeFeedback
+  _config: {fileID: 11400000, guid: be918dbcba16a0b44be34050f544d496, type: 2}
+  _layout: {fileID: 18036717}
+  _camera: {fileID: 2085674472}
+  _ringMaterial: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  _font: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  _textMaterial: {fileID: 2100000, guid: 187bf06a6ec20ad45a604fd729ac9ded, type: 2}
+  _destroySpark: {fileID: 21300000, guid: 8c4d16b69d126764cad0ed9af534605b, type: 3}
 --- !u!1 &1648887152
 GameObject:
   m_ObjectHideFlags: 0
@@ -4470,6 +4494,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2066649386}
+  - component: {fileID: 2066649388}
+  - component: {fileID: 2066649387}
   m_Layer: 0
   m_Name: MergeSystem
   m_TagString: Untagged
@@ -4492,6 +4518,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2062906274}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2066649387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066649385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c52182a18e505e74181708f45a4f148f, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MergeBlast.OverloadSystem
+  _config: {fileID: 11400000, guid: 8ed07e678d2ad8143998f3034c8d2588, type: 2}
+  _spawner: {fileID: 714575256}
+  _battle: {fileID: 1132915536}
+  _feedback: {fileID: 1644629510}
+--- !u!114 &2066649388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066649385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e83bfaed1b8b8904bbd6eb07356d90fb, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MergeBlast.MergeSystem
+  _config: {fileID: 11400000, guid: 8ed07e678d2ad8143998f3034c8d2588, type: 2}
+  _spawner: {fileID: 714575256}
+  _overload: {fileID: 2066649387}
+  _feedback: {fileID: 1644629510}
 --- !u!1 &2085674471
 GameObject:
   m_ObjectHideFlags: 0

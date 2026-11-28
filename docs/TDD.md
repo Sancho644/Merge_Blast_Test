@@ -1,9 +1,9 @@
-# TDD — Merge Blast: Overload v0.2
+# TDD — Merge Blast: Overload v0.3
 
-27.11.2026 • Техническая спецификация, не отчёт о реализации. Источник игровых правил — GDD.md.
+28.11.2026 • Техническая спецификация. Источник игровых правил — GDD.md.
 
 ## 1. Стек и структура
-Unity 6 LTS (точную версию зафиксировать после создания проекта), Universal 2D URP, Android Portrait, 60 FPS target, uGUI + TMP, Input System, Physics2D, DOTween (если доступен и лицензия допускает; иначе простые корутины/Animator). Одна сцена Main. Никаких ECS/DI/EventBus/сохранений. Не подключать Spine: у CraftPix есть PNG кадры.
+Unity 6000.6.7f1, Universal 2D URP, Android Portrait, 60 FPS target, uGUI + TMP, Input System, Physics2D, DOTween (если доступен и лицензия допускает; иначе простые корутины/Animator). Одна сцена Main. Никаких ECS/DI/EventBus/сохранений. Не подключать Spine: у CraftPix есть PNG кадры.
 
 ```
 Assets/
@@ -54,8 +54,10 @@ Reference 1080×1920, CanvasScaler Scale With Screen Size, safe area. Грани
 | Projectile | FixedUpdate sweep, урон, отражение, остаток дистанции, lifetime |
 | Ball | Номинал, HP, радиус, Rigidbody2D, состояние Active/Reserved/Removed, контакт, визуал |
 | BombBall | Active/PlayerDetonated/TimedOut/Removed; таймер, успешный тап/штраф |
-| BallSpawner | WaveConfig, случайность, лимит, гарантированный запрос пары 16, учёт бомб |
-| MergeSystem | Очередь пар, атомарное резервирование, слияние, Overload, границы |
+| BallSpawner | WaveConfig, случайный спавн, лимит, окно контролируемой пары 16, регистрация объединённых шаров |
+| MergeSystem | Атомарное резервирование и обработка очереди пар текущей BattleSession |
+| OverloadSystem | Снимок шаров, урон в радиусе, отдельный бонус за перегрузку |
+| MergeFeedback | Временные визуальные эффекты Merge / Overload, shake, управление временем эффекта |
 | ProgressionService | PlayerProgress, цены, проверка и атомарная покупка, WalletChanged |
 | UIController | Экраны, подписки, кнопки, обновления, safe area |
 | FeedbackService | VFX, SFX, shake, timeScale, анимации; не определяет правила |
@@ -86,12 +88,28 @@ Cannon ограничивается кодом. Снаряд query mask Ball/Bou
 На создание передать damage, speed, direction, remainingBounces, lifetime. В FixedUpdate: budget = speed * fixedDeltaTime (игровое время). CircleCast вдоль direction на budget. Без hit — переместить на budget. При hit выбрать ближайший допустимый контакт, сохранить normal и point/centroid до урона; переместить центр к centroid с небольшим skin наружу. При Ball нанести damage ровно один раз. Если remainingBounces == 0 — удалить пулю. Иначе decrement, direction = Vector2.Reflect(direction, normal).normalized, продолжить с остатком budget. Угол нормали и повторные контакты обрабатывать с проверкой dot(direction, normal), нулевой дистанции и небольшим skin; ограничить число итераций на шаг (например 6–8). Сохранять оставшуюся дистанцию только в рамках текущего шага; не разгонять пулю. Срок жизни 6 сек независимо от числа рикошетов. В углу один геометрический контакт обрабатывается за раз, не удваивать расход из-за overlap. Уничтожение шара не должно лишать нормали. Визуальный след очищать при повторном использовании. Если нужен пул объектов, внедрять только при измеренной проблеме.
 
 ## 7. Merge / Bomb
-В OnCollisionEnter/Stay шар передаёт пару MergeSystem. Резервировать Active + Active одинакового номинала, вне cooldown, один запрос на пару. Удаление и создание выполнить после физического callback (очередь), удалить коллайдеры/выключить участие сразу после резервирования; повторные события игнорируются. HP и позиции снапшотить; отмена запроса при недействительной сессии. Overload обходит снимок списка активных обычных шаров в радиусе, не коллекцию, которую модифицирует. Один путь начисления награды за уничтожение и один отдельный бонус Overload.
+В OnCollisionEnter2D и OnCollisionStay2D шар передаёт пару MergeSystem. После проверки состояния, номинала, cooldown и текущей BattleSession оба шара сразу переходят в Reserved на главном потоке. В этот момент фиксируются HP, средняя позиция и средняя скорость с вертикальным импульсом из BallConfig. Повторные запросы и урон по этой паре блокируются. BattleController разбирает очередь в Update после физических callbacks, перед очередным спавном. При этом исходные коллайдеры выключаются и исходные шары удаляются без награды. BallSpawner вписывает новую окружность в арену по её радиусу, регистрирует результат и запускает cooldown 0,25 сек игрового времени. Restart и завершение боя очищают очередь и runtime.
+
+Для 16+16 OverloadSystem берёт снимок зарегистрированных шаров, проверяет их состояние, сессию и положение центра относительно радиуса. Бонус берётся из награды условного номинала 32. Уничтоженные взрывом шары начисляют награду через обычный путь BallSpawner. MergeFeedback использует реальное время, а повторная перегрузка продлевает slow motion от момента последнего взрыва. Обычное завершение эффекта и очистка восстанавливают исходные timeScale, fixedDeltaTime и камеру.
+
+BallSpawner проверяет MinSpawnInterval и номер кадра в общей точке спавна волны и контролируемой пары. Сразу после создания он сохраняет Time.timeAsDouble и Time.frameCount. До открытия интервала прогресс хранит максимум один запрос, при заполнении арены сбрасывается. Merge создаёт замену пары отдельным путём. Новые шары волны получают SpawnMergeCooldown 0,75 сек. Таймеры используют игровое время.
+
+Контролируемая пара создаётся последовательно. Для первой попытки нужны два свободных места и время для второго спавна внутри FirstPairSpawnWindow. Для второго шара BallSpawner проверяет свободные верхние позиции и выбирает траекторию с учётом приблизительного отскока первого от пола и стен. Пара может встретиться естественно. При потере первого шара или истечении окна оставшийся запрос отменяется. Restart обнуляет прогресс, дедлайн и состояние пары.
+
+Смертельный урон от Projectile передаёт в MergeFeedback позицию Rigidbody2D и tier до завершения удаления. Коллайдер выключается сразу. Отдельный визуальный объект живёт 0,35 сек реального времени. Урон Overload использует обычный путь наград без отдельного Ball Destroy. BattleController очищает эффекты при Restart и завершении боя.
 
 BombBall.Update уменьшает scaled timer только в Battle. TimerImage.fillAmount = Clamp01(remaining/total). GameplayInput запоминает target на pointer down, проверяет живость при отпускании и Tap threshold. Если бомба уже истекла, тап не активирует её повторно. При тапе сначала атомарно сменить состояние, затем обработать снимок обычных шаров, затем награду/feedback и despawn. При таймауте вызвать DamagePlayer(ignoreInvulnerability: true). При окончании сессии Cancel без штрафа.
 
+### 7.1 Shield Ball & Energy Shield — план P3.1
+
+- Переиспользовать Ball, физику и текущий путь награды для Shield Ball. Типы Normal, Shield и Bomb разграничивают правила Merge, попадания и тап. Shield Ball сохраняет состояния Active → Removed. Ветка Reserved принадлежит обычным парам Merge.
+- BallSpawner проверяет ShieldConfig, игровой таймер, наличие активного Shield Ball и общий лимит до выбора замены обычного спавна. Успешное создание использует общий интервал. Дедлайн Shield Ball обновляется после успешного создания. Завершение боя очищает объект и состояние спавна.
+- При первом переходе Shield Ball в Removed от смертельного игрового урона начислить обычную награду и восстановить два заряда в текущей BattleSession. Этот путь общий для снаряда, Overload и успешной бомбы. Despawn для очистки обходит выдачу защиты и монет.
+- BattleSession хранит заряды, жизни и срок неуязвимости. При контакте BattleController сначала проверяет активность сессии и неуязвимость, затем расходует один заряд или снимает сердце. Принятый контакт запускает неуязвимость 1,5 сек и существующий отскок. Штраф пропущенной бомбы идёт напрямую в потерю сердца. Restart и конец боя очищают заряды и визуальные эффекты.
+- ShieldView и BattleHud отображают заряды. Система feedback показывает получение, поглощение и разрушение щита по событиям боя. Коллайдер пушки остаётся неизменным. Настраиваемые параметры будущего ShieldConfig заданы в GDD.
+
 ## 8. Конфигурации
-ScriptableObject: BattleConfig (duration, hearts, victoryBonus, invuln); BallConfig (tiers, HP, radius, sprite, color, reward, physics, mergeCooldown, Overload); CannonConfig (moveSpeed, bulletSpeed, bulletRadius, lifetime); ProgressionConfig (10 CannonLevelData, 3 RicochetData); WaveConfig (phases, spawn curve, first pair 16, maxActive); BombConfig (spawn chance, cooldown, duration, tiers); FeedbackConfig (shake, slowdown, pitches, timing). Не мутировать SO при игре.
+Конфигурации ScriptableObject включают BattleConfig (время, сердца, награда за победу, неуязвимость), BallConfig (номиналы, HP, радиус, графика, монеты, физика, SpawnMergeCooldown, MergeCooldown, Overload), CannonConfig (движение и параметры снаряда), ProgressionConfig (10 уровней пушки, 3 уровня рикошета), WaveConfig (фазы, кривая, окно пары 16, MaxActive, MinSpawnInterval), BombConfig (шанс, интервалы, таймер и номиналы) и FeedbackConfig (shake, замедление, pitch и длительности). Значения ассетов сохраняются при запуске боя.
 
 CannonLevelData: Level, UpgradeCost (цена достижения), Damage, FireRate, MaxAvailableBounces, Visual. PlayerProgress: Coins=0, CannonLevel=1, RicochetLevel=0. RicochetData: Level, RequiredCannonLevel, Price. При покупке проверять next level, max, деньги и prerequisite до изменения состояния. Характеристики и визуал из конфигов; только GDD определяет стартовые значения.
 
