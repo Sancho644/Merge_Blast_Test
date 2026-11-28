@@ -10,6 +10,9 @@ namespace MergeBlast
         private const float RingRadius = 1.12f;
         private const float TrackWidthToDiameter = 0.07f;
         private const float FillWidthToDiameter = 0.06f;
+        private const float MergePunchDuration = 0.18f;
+
+        private enum State { Removed, Active, Reserved }
 
         [SerializeField] private Rigidbody2D _body;
         [SerializeField] private CircleCollider2D _collider;
@@ -22,20 +25,37 @@ namespace MergeBlast
         private BallConfig _config;
         private BallConfig.Tier _tier;
         private Collider2D _floor;
+        private MergeSystem _merge;
+        private MergeFeedback _feedback;
+        private State _state;
+        private float _mergeReadyAt;
+        private float _punchStartedAt = float.NegativeInfinity;
 
         public int Nominal => _tier.Nominal;
         public int HitPoints { get; private set; }
-        public bool IsActive { get; private set; }
+        public bool IsActive => _state == State.Active;
+        internal bool CanMerge => IsActive && Time.time >= _mergeReadyAt;
+        internal bool IsReserved => _state == State.Reserved;
+        internal BattleSession Session { get; private set; }
+        internal Vector2 Position => _body.position;
+        internal Vector2 Velocity => _body.linearVelocity;
         public event Action<Ball, int> Removed;
 
-        public void Initialize(BallConfig config, BallConfig.Tier tier, Collider2D floor,
-            PhysicsMaterial2D material, Vector2 velocity)
+        internal void Initialize(BallConfig config, BallConfig.Tier tier, Collider2D floor,
+            PhysicsMaterial2D material, Vector2 velocity, BattleSession session, MergeSystem merge,
+            MergeFeedback feedback, int? mergedHp)
         {
             _config = config;
             _tier = tier;
             _floor = floor;
-            HitPoints = tier.MaxHp;
-            IsActive = true;
+            Session = session;
+            _merge = merge;
+            _feedback = feedback;
+            HitPoints = mergedHp ?? tier.MaxHp;
+            _state = State.Active;
+            _mergeReadyAt = Time.time + (mergedHp.HasValue ? config.MergeCooldown : config.SpawnMergeCooldown);
+            if (mergedHp.HasValue)
+                _punchStartedAt = Time.unscaledTime;
             _collider.radius = tier.Radius;
             _collider.sharedMaterial = material;
             _body.gravityScale = config.GravityScale;
@@ -57,16 +77,34 @@ namespace MergeBlast
         {
             if (_visual.rotation != Quaternion.identity)
                 _visual.rotation = Quaternion.identity;
+
+            float elapsed = Time.unscaledTime - _punchStartedAt;
+            if (elapsed < MergePunchDuration)
+            {
+                float multiplier = 1f + 0.26f * Mathf.Sin(Mathf.PI * elapsed / MergePunchDuration);
+                float scale = _tier.Radius * multiplier;
+                _visual.localScale = new Vector3(scale, scale, 1f);
+            }
+            else if (_punchStartedAt != float.NegativeInfinity)
+            {
+                _visual.localScale = new Vector3(_tier.Radius, _tier.Radius, 1f);
+                _punchStartedAt = float.NegativeInfinity;
+            }
         }
 
-        public bool TryDamage(int damage, Vector2 direction)
+        // MergeSystem checks both candidates before reserving either one.
+        internal void ReserveForMerge() => _state = State.Reserved;
+
+        public bool TryDamage(int damage, Vector2 direction) => TryDamage(damage, direction, false);
+
+        internal bool TryDamage(int damage, Vector2 direction, bool fromProjectile)
         {
             if (!IsActive || damage <= 0)
                 return false;
 
             HitPoints = Mathf.Max(0, HitPoints - damage);
             if (HitPoints == 0)
-                Remove(_tier.Reward);
+                Remove(_tier.Reward, fromProjectile);
             else
             {
                 RefreshHealth();
@@ -88,27 +126,40 @@ namespace MergeBlast
 
         public void Despawn()
         {
-            if (IsActive)
+            if (_state != State.Removed)
                 Remove(0);
         }
 
-        private void Remove(int reward)
+        private void Remove(int reward, bool fromProjectile = false)
         {
-            IsActive = false;
+            Vector2 destroyCenter = fromProjectile ? Position : default;
+            _state = State.Removed;
             if (_collider != null)
                 _collider.enabled = false;
             gameObject.SetActive(false);
             Destroy(gameObject);
             Removed?.Invoke(this, reward);
+            if (fromProjectile && Session?.IsActive == true && _feedback != null)
+                _feedback.PlayBallDestroy(destroyCenter, _tier);
         }
 
-        private void OnCollisionEnter2D(Collision2D collision) => BounceFromFloor(collision);
-        private void OnCollisionStay2D(Collision2D collision) => BounceFromFloor(collision);
+        private void OnCollisionEnter2D(Collision2D collision) => HandleCollision(collision);
+        private void OnCollisionStay2D(Collision2D collision) => HandleCollision(collision);
 
-        private void BounceFromFloor(Collision2D collision)
+        private void HandleCollision(Collision2D collision)
         {
-            if (IsActive && collision.collider == _floor && _body.linearVelocityY < _config.MinFloorBounceSpeed)
-                _body.linearVelocityY = _config.MinFloorBounceSpeed;
+            if (!IsActive)
+                return;
+
+            if (collision.collider == _floor)
+            {
+                if (_body.linearVelocityY < _config.MinFloorBounceSpeed)
+                    _body.linearVelocityY = _config.MinFloorBounceSpeed;
+                return;
+            }
+
+            if (CanMerge && collision.collider.TryGetComponent<Ball>(out var other))
+                _merge.TryQueue(this, other);
         }
 
         private void RefreshHealth() => SetRing(_hpFill, (float)HitPoints / _tier.MaxHp);

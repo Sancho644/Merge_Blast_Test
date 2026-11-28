@@ -11,3 +11,7 @@ Digitized data copyright © 2010 Google Corporation. Copyright © 2012 Red Hat, 
 ## Colored Spheres
 
 Colored Spheres by athile. The [four imported sprites](Assets/_Project/Art/ColoredSpheres) are `sphere-13.png`, `sphere-23.png`, `sphere-02.png`, and `sphere-12.png`, published under CC0 1.0 Universal. [Original release and license declaration](https://opengameart.org/content/colored-spheres) · [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
+
+## Kenney Particle Pack
+
+The project uses [spark_01.png](Assets/_Project/Art/Particles/spark_01.png) from Kenney's Particle Pack under CC0 1.0 Universal. [Original release and license declaration](https://kenney.nl/assets/particle-pack) · [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)

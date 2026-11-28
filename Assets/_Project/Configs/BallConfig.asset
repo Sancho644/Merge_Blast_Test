@@ -60,6 +60,7 @@ MonoBehaviour:
   <MinFloorBounceSpeed>k__BackingField: 4.5
   <ProjectileHitImpulse>k__BackingField: 0.25
   <MergeCooldown>k__BackingField: 0.25
+  <SpawnMergeCooldown>k__BackingField: 0.75
   <MergeUpwardImpulse>k__BackingField: 1
   <OverloadRadius>k__BackingField: 3
   <OverloadDamage>k__BackingField: 16

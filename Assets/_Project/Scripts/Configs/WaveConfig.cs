@@ -32,6 +32,7 @@ namespace MergeBlast
 
         public IReadOnlyList<Phase> Phases => _phases;
         [field: SerializeField] public int MaxActive { get; private set; } = 8;
+        [field: SerializeField, Min(0.01f)] public float MinSpawnInterval { get; private set; } = 1f;
         [field: SerializeField] public int FirstPairNominal { get; private set; } = 16;
         [field: SerializeField] public Vector2 FirstPairSpawnWindow { get; private set; } = new(12f, 18f);
 
